@@ -11,6 +11,6 @@ selinux-policy-devel
 
 ## Installation
 * clone the repository
-* make -f /usr/share/selinux/devel/Makefile
-* semodule -i naemon_42.pp
-* restorecon restorecon -Rv /etc/naemon /var/log/naemon /var/cache/naemon /var/lib/naemon
+* `make -f /usr/share/selinux/devel/Makefile`
+* `semodule -i naemon_42.pp`
+* `restorecon restorecon -Rv /etc/naemon /var/log/naemon /var/cache/naemon /var/lib/naemon`
