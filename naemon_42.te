@@ -10,12 +10,21 @@ files_type(naemon_etc_t)
 require {
   type naemon_t;
   type naemon_exec_t;
+  type naemon_cache_t;
+  type naemon_var_lib_t;
   type nagios_plugin_domain;
   type nagios_checkdisk_plugin_exec_t;
   type nagios_unconfined_plugin_exec_t;
   type ping_exec_t;
   type initrc_var_run_t;
+  type httpd_t;
 }
+
+
+#============= httpd_t ==============
+## copied from audit2allow
+allow httpd_t naemon_cache_t:sock_file { getattr write };
+allow httpd_t naemon_t:unix_stream_socket connectto;
 
 
 #============= naemon_t ==============
@@ -27,6 +36,11 @@ allow naemon_t ping_exec_t:file { execute execute_no_trans getattr open read };
 allow naemon_t self:icmp_socket { create getopt setopt };
 allow naemon_t self:process setcap;
 allow naemon_t naemon_exec_t:file execute_no_trans;
+#!!!! This avc can be allowed using the boolean 'domain_can_mmap_files'
+allow naemon_t naemon_var_lib_t:file map;
+allow naemon_t nagios_checkdisk_plugin_exec_t:file map;
+allow naemon_t nagios_unconfined_plugin_exec_t:file map;
+allow naemon_t ping_exec_t:file map;
 
 
 ## all the rest is copied from nagios.te
