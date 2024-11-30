@@ -1,0 +1,5 @@
+###
+### this aditional to the naemon part in https://github.com/fedora-selinux/selinux-policy
+###
+
+/etc/naemon(/.*)?  gen_context(system_u:object_r:naemon_etc_t,s0)

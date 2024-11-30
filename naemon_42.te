@@ -1,0 +1,118 @@
+###
+### this aditional to the naemon part in https://github.com/fedora-selinux/selinux-policy
+###
+
+policy_module(naemon_42, 0.0.1)
+
+type naemon_etc_t;
+files_type(naemon_etc_t)
+
+require {
+  type naemon_t;
+  type naemon_exec_t;
+  type nagios_plugin_domain;
+  type nagios_checkdisk_plugin_exec_t;
+  type nagios_unconfined_plugin_exec_t;
+  type ping_exec_t;
+  type initrc_var_run_t;
+}
+
+
+#============= naemon_t ==============
+## copied from audit2allow
+allow naemon_t initrc_var_run_t:file { lock open read };
+allow naemon_t nagios_checkdisk_plugin_exec_t:file { execute execute_no_trans open read };
+allow naemon_t nagios_unconfined_plugin_exec_t:file { execute execute_no_trans getattr open read };
+allow naemon_t ping_exec_t:file { execute execute_no_trans getattr open read };
+allow naemon_t self:icmp_socket { create getopt setopt };
+allow naemon_t self:process setcap;
+allow naemon_t naemon_exec_t:file execute_no_trans;
+
+
+## all the rest is copied from nagios.te
+
+allow naemon_t nagios_plugin_domain:process signal_perms;
+allow nagios_plugin_domain naemon_t:process signal_perms;
+
+########################################
+#
+# Naemon local policy mostly copied from Nagios
+#
+
+allow naemon_t self:capability { chown dac_read_search setgid setuid };
+dontaudit naemon_t self:capability sys_tty_config;
+allow naemon_t self:process { setpgid signal_perms };
+allow naemon_t self:fifo_file rw_fifo_file_perms;
+allow naemon_t self:tcp_socket { accept listen };
+allow naemon_t self:unix_stream_socket { connectto };
+
+allow naemon_t nagios_plugin_domain:process signal_perms;
+
+allow naemon_t naemon_etc_t:dir list_dir_perms;
+allow naemon_t naemon_etc_t:file { read_file_perms map };
+allow naemon_t naemon_etc_t:lnk_file read_lnk_file_perms;
+
+kernel_read_system_state(naemon_t)
+kernel_read_kernel_sysctls(naemon_t)
+kernel_read_software_raid_state(naemon_t)
+
+corecmd_exec_bin(naemon_t)
+corecmd_exec_shell(naemon_t)
+
+corenet_all_recvfrom_netlabel(naemon_t)
+corenet_tcp_sendrecv_generic_if(naemon_t)
+corenet_tcp_sendrecv_generic_node(naemon_t)
+
+corenet_sendrecv_all_client_packets(naemon_t)
+corenet_tcp_connect_all_ports(naemon_t)
+corenet_tcp_sendrecv_all_ports(naemon_t)
+
+corenet_dontaudit_tcp_bind_all_reserved_ports(naemon_t)
+corenet_dontaudit_udp_bind_all_reserved_ports(naemon_t)
+
+dev_read_sysfs(naemon_t)
+dev_read_urand(naemon_t)
+
+domain_use_interactive_fds(naemon_t)
+domain_read_all_domains_state(naemon_t)
+
+files_read_etc_runtime_files(naemon_t)
+files_read_kernel_symbol_table(naemon_t)
+files_search_spool(naemon_t)
+
+fs_getattr_all_fs(naemon_t)
+fs_search_auto_mountpoints(naemon_t)
+fs_search_cgroup_dirs(naemon_t)
+
+auth_use_nsswitch(naemon_t)
+
+logging_send_syslog_msg(naemon_t)
+
+userdom_dontaudit_use_unpriv_user_fds(naemon_t)
+userdom_dontaudit_search_user_home_dirs(naemon_t)
+
+mta_send_mail(naemon_t)
+mta_signal_system_mail(naemon_t)
+mta_kill_system_mail(naemon_t)
+
+systemd_exec_systemctl(naemon_t)
+
+optional_policy(`
+    apache_systemctl(naemon_t)
+')
+
+optional_policy(`
+    dbus_system_bus_client(naemon_t)
+')
+
+optional_policy(`
+        netutils_kill_ping(naemon_t)
+')
+
+optional_policy(`
+        seutil_sigchld_newrole(naemon_t)
+')
+
+optional_policy(`
+        udev_read_db(naemon_t)
+')
