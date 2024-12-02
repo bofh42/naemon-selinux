@@ -1,6 +1,9 @@
 ###
 ### this aditional to the naemon part in https://github.com/fedora-selinux/selinux-policy
 ###
+### for quick testing: rebuild, copy and activate with
+### make -f /usr/share/selinux/devel/Makefile && scp naemon_42.pp <host>: && ssh <host> "semodule -i naemon_42.pp"
+###
 
 policy_module(naemon_42, 0.0.1)
 
@@ -18,6 +21,7 @@ require {
   type ping_exec_t;
   type initrc_var_run_t;
   type httpd_t;
+  type snmpd_var_lib_t;
 }
 
 
@@ -41,6 +45,7 @@ allow naemon_t naemon_var_lib_t:file map;
 allow naemon_t nagios_checkdisk_plugin_exec_t:file map;
 allow naemon_t nagios_unconfined_plugin_exec_t:file map;
 allow naemon_t ping_exec_t:file map;
+allow naemon_t snmpd_var_lib_t:dir { getattr search };
 
 
 ## all the rest is copied from nagios.te
