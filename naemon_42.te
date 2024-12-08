@@ -5,7 +5,7 @@
 ### make -f /usr/share/selinux/devel/Makefile && scp naemon_42.pp <host>: && ssh <host> "semodule -i naemon_42.pp"
 ###
 
-policy_module(naemon_42, 0.0.1)
+policy_module(naemon_42, 0.0.3)
 
 type naemon_etc_t;
 files_type(naemon_etc_t)
