@@ -12,16 +12,18 @@ files_type(naemon_etc_t)
 
 require {
   type naemon_t;
-  type naemon_exec_t;
   type naemon_cache_t;
+  type naemon_exec_t;
   type naemon_var_lib_t;
-  type nagios_plugin_domain;
   type nagios_checkdisk_plugin_exec_t;
+  type nagios_plugin_domain;
+  type nagios_spool_t;
   type nagios_unconfined_plugin_exec_t;
   type ping_exec_t;
   type initrc_var_run_t;
   type httpd_t;
   type snmpd_var_lib_t;
+  type tmp_t;
 }
 
 
@@ -34,21 +36,20 @@ allow httpd_t naemon_etc_t:file { getattr ioctl open read };
 
 #============= naemon_t ==============
 ## copied from audit2allow
-allow naemon_t self:icmp_socket { create getopt setopt };
-allow naemon_t self:process setcap;
-allow naemon_t self:capability net_raw;
-allow naemon_t self:rawip_socket { create setopt };
 allow naemon_t initrc_var_run_t:file { lock open read };
-allow naemon_t nagios_checkdisk_plugin_exec_t:file { execute execute_no_trans open read };
-allow naemon_t nagios_unconfined_plugin_exec_t:file { execute execute_no_trans getattr open read };
-allow naemon_t ping_exec_t:file { execute execute_no_trans getattr open read };
+allow naemon_t naemon_etc_t:file { execute execute_no_trans };
 allow naemon_t naemon_exec_t:file execute_no_trans;
 allow naemon_t naemon_var_lib_t:file map;
-allow naemon_t nagios_checkdisk_plugin_exec_t:file map;
-allow naemon_t nagios_unconfined_plugin_exec_t:file map;
-allow naemon_t ping_exec_t:file map;
+allow naemon_t nagios_checkdisk_plugin_exec_t:file { execute execute_no_trans open read map };
+allow naemon_t nagios_spool_t:dir { add_name search write };
+allow naemon_t nagios_unconfined_plugin_exec_t:file { execute execute_no_trans getattr open read map };
+allow naemon_t ping_exec_t:file { execute execute_no_trans getattr open read map };
+allow naemon_t self:capability net_raw;
+allow naemon_t self:icmp_socket { create getopt setopt };
+allow naemon_t self:process setcap;
+allow naemon_t self:rawip_socket { create setopt };
 allow naemon_t snmpd_var_lib_t:dir { getattr search };
-
+allow naemon_t tmp_t:file { create open setattr unlink write };
 
 
 ## all the rest is copied from nagios.te
